@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { api } from '../lib/api';
-import { Check, Zap, BarChart3, Shield, Globe, ArrowRight } from 'lucide-react';
+import { Check, Zap, BarChart3, Shield, Globe, ArrowRight, QrCode } from 'lucide-react';
 
 export default function Billing() {
   const checkoutMutation = useMutation({
@@ -20,6 +20,7 @@ export default function Billing() {
   const features = [
     { icon: Zap, title: 'Lightning Fast', description: 'Instant redirects with global CDN' },
     { icon: BarChart3, title: 'Advanced Analytics', description: 'Track clicks, referrers, and trends' },
+    { icon: QrCode, title: 'QR Code Generation', description: 'Generate downloadable QR codes for any link' },
     { icon: Shield, title: 'Secure & Reliable', description: 'Enterprise-grade security' },
     { icon: Globe, title: 'Custom Domains', description: 'Use your own branded domains' },
   ];

@@ -1,9 +1,11 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Link2, CreditCard, Settings, LayoutDashboard, LogOut, Shield } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
+import { Link2, CreditCard, Settings, LayoutDashboard, LogOut, Shield, Sun, Moon } from 'lucide-react';
 
 export default function DashboardLayout() {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -25,9 +27,9 @@ export default function DashboardLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-bg flex">
+    <div className="h-screen bg-bg flex overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-64 bg-surface border-r border-border flex flex-col">
+      <aside className="w-64 h-full bg-surface border-r border-border flex flex-col flex-shrink-0">
         <div className="p-6 border-b border-border">
           <Link to="/dashboard" className="flex items-center gap-2">
             <Link2 className="w-8 h-8 text-accent" />
@@ -35,7 +37,7 @@ export default function DashboardLayout() {
           </Link>
         </div>
 
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path || 
@@ -58,7 +60,7 @@ export default function DashboardLayout() {
           })}
         </nav>
 
-        <div className="p-4 border-t border-border">
+        <div className="p-4 border-t border-border flex-shrink-0">
           <div className="flex items-center gap-3 mb-4 px-2">
             <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
               <span className="text-accent font-semibold">
@@ -73,13 +75,23 @@ export default function DashboardLayout() {
             </div>
           </div>
           
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-2 text-text-muted hover:text-danger hover:bg-danger/10 rounded-lg transition-colors"
-          >
-            <LogOut className="w-5 h-5" />
-            <span className="font-medium">Logout</span>
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={toggleTheme}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 text-text-muted hover:text-text-primary hover:bg-surface/50 rounded-lg transition-colors"
+              title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+            >
+              {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+            </button>
+            
+            <button
+              onClick={handleLogout}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 text-text-muted hover:text-danger hover:bg-danger/10 rounded-lg transition-colors"
+            >
+              <LogOut className="w-5 h-5" />
+              <span className="font-medium">Logout</span>
+            </button>
+          </div>
         </div>
       </aside>
 
