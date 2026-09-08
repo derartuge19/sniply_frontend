@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
-import { Users, DollarSign, TrendingUp, Activity, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Users, DollarSign, TrendingUp, Activity, XCircle } from 'lucide-react';
 
 interface Revenue {
   total_users: number;
@@ -11,7 +10,7 @@ interface Revenue {
   canceled_subscriptions: number;
 }
 
-export default function AdminDashboard() {
+export default function AdminRevenue() {
   const { data: revenue, isLoading } = useQuery({
     queryKey: ['admin-revenue'],
     queryFn: async () => {
@@ -30,8 +29,8 @@ export default function AdminDashboard() {
   return (
     <div className="p-8">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-text-primary mb-2">Admin Dashboard</h1>
-        <p className="text-text-muted mb-8">Overview of platform performance and user activity</p>
+        <h1 className="text-3xl font-bold text-text-primary mb-2">Revenue</h1>
+        <p className="text-text-muted mb-8">Track platform revenue and subscription metrics</p>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -80,43 +79,16 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Quick Links */}
-        <div className="grid md:grid-cols-3 gap-6">
-          <Link
-            to="/admin/users"
-            className="p-6 rounded-lg bg-surface border border-border hover:border-accent-admin transition-colors group"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <Users className="w-8 h-8 text-accent-admin" />
-              <ArrowRight className="w-5 h-5 text-text-muted group-hover:text-accent-admin transition-colors" />
-            </div>
-            <h3 className="text-lg font-semibold text-text-primary mb-2">Manage Users</h3>
-            <p className="text-sm text-text-muted">View and manage all platform users</p>
-          </Link>
-
-          <Link
-            to="/admin/revenue"
-            className="p-6 rounded-lg bg-surface border border-border hover:border-accent-admin transition-colors group"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <DollarSign className="w-8 h-8 text-accent-admin" />
-              <ArrowRight className="w-5 h-5 text-text-muted group-hover:text-accent-admin transition-colors" />
-            </div>
-            <h3 className="text-lg font-semibold text-text-primary mb-2">View Revenue</h3>
-            <p className="text-sm text-text-muted">Track revenue and subscription metrics</p>
-          </Link>
-
-          <Link
-            to="/admin/analytics"
-            className="p-6 rounded-lg bg-surface border border-border hover:border-accent-admin transition-colors group"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <Activity className="w-8 h-8 text-accent-admin" />
-              <ArrowRight className="w-5 h-5 text-text-muted group-hover:text-accent-admin transition-colors" />
-            </div>
-            <h3 className="text-lg font-semibold text-text-primary mb-2">Analytics</h3>
-            <p className="text-sm text-text-muted">View subscription and user analytics</p>
-          </Link>
+        {/* Canceled Subscriptions */}
+        <div className="p-6 rounded-lg bg-surface border border-border">
+          <div className="flex items-center gap-3 mb-4">
+            <XCircle className="w-6 h-6 text-danger" />
+            <h2 className="text-xl font-semibold text-text-primary">Canceled Subscriptions</h2>
+          </div>
+          <div className="text-4xl font-bold text-text-primary">
+            {isLoading ? '...' : revenue?.canceled_subscriptions || 0}
+          </div>
+          <p className="text-sm text-text-muted mt-2">Total canceled subscriptions (last 30 days)</p>
         </div>
       </div>
     </div>

@@ -6,6 +6,7 @@ interface User {
   id: number;
   email: string;
   username: string;
+  is_staff: boolean;
 }
 
 interface AuthContextType {
@@ -42,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string) => {
     const response = await api.post('/api/auth/login/', { email, password });
     const { user: userData, access, refresh } = response.data;
-    
+
     localStorage.setItem('access_token', access);
     localStorage.setItem('refresh_token', refresh);
     localStorage.setItem('user', JSON.stringify(userData));

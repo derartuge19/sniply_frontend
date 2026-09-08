@@ -17,12 +17,7 @@ export function StaffRoute({ children }: { children: ReactNode }) {
     return <Navigate to="/login" replace />;
   }
 
-  // Note: is_staff is not currently in the user object from login/register
-  // This will need to be updated once backend includes it, or we fetch from admin endpoint
-  // For now, we'll check a flag in localStorage or fetch admin data
-  const isStaff = localStorage.getItem('is_staff') === 'true';
-  
-  if (!isStaff) {
+  if (!user.is_staff) {
     return <Navigate to="/dashboard" replace />;
   }
 

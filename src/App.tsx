@@ -6,6 +6,7 @@ import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import DashboardLayout from './components/DashboardLayout';
+import AdminLayout from './components/AdminLayout';
 import DashboardHome from './pages/DashboardHome.tsx';
 import LinkDetail from './pages/LinkDetail';
 import Billing from './pages/Billing.tsx';
@@ -13,6 +14,9 @@ import BillingSuccess from './pages/BillingSuccess';
 import BillingCancel from './pages/BillingCancel';
 import Settings from './pages/Settings';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminUsers from './pages/AdminUsers';
+import AdminRevenue from './pages/AdminRevenue';
+import AdminAnalytics from './pages/AdminAnalytics';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -102,11 +106,14 @@ function App() {
             path="/admin"
             element={
               <StaffRoute>
-                <DashboardLayout />
+                <AdminLayout />
               </StaffRoute>
             }
           >
             <Route index element={<AdminDashboard />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="revenue" element={<AdminRevenue />} />
+            <Route path="analytics" element={<AdminAnalytics />} />
           </Route>
           
           <Route path="*" element={<Navigate to="/" replace />} />
