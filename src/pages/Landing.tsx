@@ -31,12 +31,6 @@ export default function Landing() {
               Get Started Free
               <ArrowRight className="w-5 h-5" />
             </Link>
-            <Link
-              to="/login"
-              className="inline-flex items-center justify-center px-8 py-4 bg-surface border border-border hover:border-accent text-text-primary font-semibold rounded-lg transition-colors"
-            >
-              Log In
-            </Link>
           </div>
         </div>
       </section>

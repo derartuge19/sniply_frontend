@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { UserPlus } from 'lucide-react';
@@ -9,8 +9,37 @@ export default function Register() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { register } = useAuth();
+  const { register, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Load Google Identity Services script
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  const handleGoogleSignIn = async (response: any) => {
+    try {
+      setIsLoading(true);
+      setError('');
+      await loginWithGoogle(response.credential);
+      navigate('/dashboard');
+    } catch (err: any) {
+      setError(err.response?.data?.detail || 'Google registration failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // @ts-ignore - Google global
+  window.handleGoogleSignIn = handleGoogleSignIn;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,6 +129,43 @@ export default function Register() {
             {isLoading ? 'Creating account...' : 'Create Account'}
           </button>
         </form>
+
+        <div className="mt-4">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-border" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-bg text-text-muted">Or continue with</span>
+            </div>
+          </div>
+
+          <div className="mt-4">
+            {import.meta.env.VITE_GOOGLE_CLIENT_ID ? (
+              <>
+                <div
+                  id="g_id_onload"
+                  data-client_id={import.meta.env.VITE_GOOGLE_CLIENT_ID}
+                  data-callback="handleGoogleSignIn"
+                  data-auto_prompt="false"
+                ></div>
+                <div
+                  className="g_id_signin"
+                  data-type="standard"
+                  data-size="large"
+                  data-theme="outline"
+                  data-text="sign_up_with"
+                  data-shape="rectangular"
+                  data-logo_alignment="left"
+                ></div>
+              </>
+            ) : (
+              <div className="text-center text-text-muted text-sm">
+                Google login is not configured. Add VITE_GOOGLE_CLIENT_ID to your .env file.
+              </div>
+            )}
+          </div>
+        </div>
 
         <p className="text-center text-text-muted mt-6">
           Already have an account?{' '}

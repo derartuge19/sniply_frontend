@@ -8,12 +8,12 @@ export default function BillingCancel() {
         <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-warning/10 mb-6">
           <XCircle className="w-10 h-10 text-warning" />
         </div>
-        
-        <h1 className="text-3xl font-bold text-text-primary mb-2">Payment Cancelled</h1>
+
+        <h1 className="text-3xl font-bold text-text-primary mb-2">Checkout Cancelled</h1>
         <p className="text-text-muted mb-8">
-          Your payment was cancelled. You can upgrade anytime from the billing page.
+          Checkout was cancelled — no charge was made.
         </p>
-        
+
         <div className="space-y-3">
           <Link
             to="/billing"

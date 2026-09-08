@@ -8,6 +8,7 @@ interface LinkItem {
   id: number;
   original_url: string;
   short_code: string;
+  short_url: string;
   created_at: string;
   click_count: number;
   is_active: boolean;
@@ -86,8 +87,7 @@ export default function DashboardHome() {
     }
   };
 
-  const handleCopy = (shortCode: string, id: number) => {
-    const shortUrl = `${window.location.origin}/${shortCode}`;
+  const handleCopy = (shortUrl: string, id: number) => {
     navigator.clipboard.writeText(shortUrl);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
@@ -111,7 +111,7 @@ export default function DashboardHome() {
     });
   };
 
-  const truncateUrl = (url: string, maxLength: 50) => {
+  const truncateUrl = (url: string, maxLength: number) => {
     if (url.length <= maxLength) return url;
     return url.slice(0, maxLength) + '...';
   };
@@ -200,10 +200,10 @@ export default function DashboardHome() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-2">
                       <span className="font-mono text-accent text-sm">
-                        {window.location.origin}/{link.short_code}
+                        {link.short_url}
                       </span>
                       <button
-                        onClick={() => handleCopy(link.short_code, link.id)}
+                        onClick={() => handleCopy(link.short_url, link.id)}
                         className="p-1.5 hover:bg-surface/50 rounded transition-colors group relative"
                       >
                         {copiedId === link.id ? (
@@ -213,7 +213,7 @@ export default function DashboardHome() {
                         )}
                       </button>
                       <a
-                        href={`${window.location.origin}/${link.short_code}`}
+                        href={link.short_url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="p-1.5 hover:bg-surface/50 rounded transition-colors"

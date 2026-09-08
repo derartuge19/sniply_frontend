@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { ArrowLeft, Copy, Download, Lock, Edit2, ExternalLink, BarChart2, Globe } from 'lucide-react';
@@ -10,6 +10,7 @@ interface LinkDetail {
   id: number;
   original_url: string;
   short_code: string;
+  short_url: string;
   created_at: string;
   click_count: number;
   is_active: boolean;
@@ -28,6 +29,7 @@ export default function LinkDetail() {
   const [newUrl, setNewUrl] = useState('');
   const [qrError, setQrError] = useState('');
   const [editError, setEditError] = useState('');
+  const [qrImageUrl, setQrImageUrl] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
   const { data: link, isLoading: linkLoading } = useQuery({
@@ -36,10 +38,46 @@ export default function LinkDetail() {
       const response = await api.get<LinkDetail>(`/api/links/${id}/`);
       return response.data;
     },
-    onSuccess: (data) => {
-      setNewUrl(data.original_url);
-    },
   });
+
+  // Update newUrl when link data changes
+  useEffect(() => {
+    if (link) {
+      setNewUrl(link.original_url);
+    }
+  }, [link]);
+
+  // Fetch QR code image
+  useEffect(() => {
+    let currentUrl: string | null = null;
+
+    const fetchQrCode = async () => {
+      try {
+        const response = await api.get(`/api/links/${id}/qr/`, {
+          responseType: 'blob',
+        });
+        const url = URL.createObjectURL(response.data);
+        currentUrl = url;
+        setQrImageUrl(url);
+        setQrError('');
+      } catch (error: any) {
+        if (error.response?.status === 403) {
+          setQrError('QR code generation is a Pro feature');
+        } else {
+          setQrError('Failed to load QR code');
+        }
+      }
+    };
+
+    fetchQrCode();
+
+    // Cleanup: revoke object URL on unmount or when id changes
+    return () => {
+      if (currentUrl) {
+        URL.revokeObjectURL(currentUrl);
+      }
+    };
+  }, [id]);
 
   const { data: analytics, isLoading: analyticsLoading } = useQuery({
     queryKey: ['analytics', id],
@@ -144,7 +182,7 @@ export default function LinkDetail() {
     );
   }
 
-  const shortUrl = `${window.location.origin}/${link.short_code}`;
+  const shortUrl = link.short_url;
 
   return (
     <div className="p-8">
@@ -254,13 +292,14 @@ export default function LinkDetail() {
                     Upgrade to Pro
                   </Link>
                 </div>
-              ) : (
+              ) : qrImageUrl ? (
                 <img
-                  src={`/api/links/${id}/qr/`}
+                  src={qrImageUrl}
                   alt="QR Code"
                   className="w-full h-full object-contain rounded"
-                  onError={() => setQrError('QR code generation is a Pro feature')}
                 />
+              ) : (
+                <div className="animate-pulse w-full h-full bg-surface rounded" />
               )}
             </div>
             <button
