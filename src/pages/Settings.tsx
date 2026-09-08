@@ -1,10 +1,28 @@
 import { useAuth } from '../context/AuthContext';
-import { User, Mail, Calendar, CreditCard, LogOut } from 'lucide-react';
+import { User, Mail, Calendar, CreditCard, LogOut, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { api } from '../lib/api';
+
+interface Usage {
+  used: number;
+  limit: number | null;
+  remaining: number | null;
+}
 
 export default function Settings() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+
+  const { data: usage } = useQuery({
+    queryKey: ['usage'],
+    queryFn: async () => {
+      const response = await api.get<Usage>('/api/usage/current/');
+      return response.data;
+    },
+  });
+
+  const isPro = usage?.limit === null;
 
   const handleLogout = () => {
     logout();
@@ -65,21 +83,33 @@ export default function Settings() {
         {/* Plan Section */}
         <div className="p-6 rounded-lg bg-surface border border-border mb-6">
           <h2 className="text-lg font-semibold text-text-primary mb-4">Subscription</h2>
-          
+
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <CreditCard className="w-5 h-5 text-accent" />
               <div>
-                <p className="font-medium text-text-primary">Free Plan</p>
-                <p className="text-sm text-text-muted">100 links per month</p>
+                <p className="font-medium text-text-primary">
+                  {isPro ? 'Pro Plan' : 'Free Plan'}
+                </p>
+                <p className="text-sm text-text-muted">
+                  {isPro ? 'Unlimited links' : `${usage?.limit || 100} links per month`}
+                </p>
               </div>
             </div>
-            <button
-              onClick={() => navigate('/billing')}
-              className="px-4 py-2 bg-accent hover:bg-accent/90 text-white text-sm font-medium rounded-lg transition-colors"
-            >
-              Upgrade to Pro
-            </button>
+            {!isPro && (
+              <button
+                onClick={() => navigate('/billing')}
+                className="px-4 py-2 bg-accent hover:bg-accent/90 text-white text-sm font-medium rounded-lg transition-colors"
+              >
+                Upgrade to Pro
+              </button>
+            )}
+            {isPro && (
+              <div className="flex items-center gap-2 px-3 py-2 bg-success/10 rounded-lg">
+                <Check className="w-4 h-4 text-success" />
+                <span className="text-sm font-medium text-success">Active</span>
+              </div>
+            )}
           </div>
         </div>
 

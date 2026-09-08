@@ -1,8 +1,24 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { Check, Zap, BarChart3, Shield, Globe, ArrowRight, QrCode } from 'lucide-react';
 
+interface Usage {
+  used: number;
+  limit: number | null;
+  remaining: number | null;
+}
+
 export default function Billing() {
+  const { data: usage } = useQuery({
+    queryKey: ['usage'],
+    queryFn: async () => {
+      const response = await api.get<Usage>('/api/usage/current/');
+      return response.data;
+    },
+  });
+
+  const isPro = usage?.limit === null;
+
   const checkoutMutation = useMutation({
     mutationFn: async () => {
       const response = await api.post<{ checkout_url: string }>('/api/billing/checkout/');
@@ -33,16 +49,21 @@ export default function Billing() {
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* Free Plan */}
-          <div className="p-8 rounded-xl bg-surface border border-border">
+          <div className={`p-8 rounded-xl bg-surface ${!isPro ? 'border-2 border-accent relative' : 'border border-border'}`}>
+            {!isPro && (
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-accent text-white text-sm font-semibold rounded-full">
+                Current Plan
+              </div>
+            )}
             <h3 className="text-2xl font-semibold text-text-primary mb-2">Free</h3>
             <div className="text-4xl font-bold text-text-primary mb-6">$0<span className="text-lg text-text-muted font-normal">/month</span></div>
-            
+
             <ul className="space-y-3 mb-8">
               <li className="flex items-center gap-3 text-text-muted">
                 <div className="w-5 h-5 rounded-full bg-success/20 flex items-center justify-center">
                   <div className="w-2 h-2 rounded-full bg-success" />
                 </div>
-                100 links per month
+                {usage?.limit || 100} links per month
               </li>
               <li className="flex items-center gap-3 text-text-muted">
                 <div className="w-5 h-5 rounded-full bg-success/20 flex items-center justify-center">
@@ -57,24 +78,26 @@ export default function Billing() {
                 Link management
               </li>
             </ul>
-            
+
             <button
               disabled
               className="w-full px-6 py-3 bg-surface border border-border text-text-muted font-semibold rounded-lg cursor-not-allowed"
             >
-              Current Plan
+              {!isPro ? 'Current Plan' : 'Current Plan'}
             </button>
           </div>
-          
+
           {/* Pro Plan */}
-          <div className="p-8 rounded-xl bg-surface border-2 border-accent relative">
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-accent text-white text-sm font-semibold rounded-full">
-              Upgrade
-            </div>
-            
+          <div className={`p-8 rounded-xl bg-surface ${isPro ? 'border-2 border-accent relative' : 'border border-border'}`}>
+            {isPro && (
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-accent text-white text-sm font-semibold rounded-full">
+                Current Plan
+              </div>
+            )}
+
             <h3 className="text-2xl font-semibold text-text-primary mb-2">Pro</h3>
             <div className="text-4xl font-bold text-text-primary mb-6">$9<span className="text-lg text-text-muted font-normal">/month</span></div>
-            
+
             <ul className="space-y-3 mb-8">
               <li className="flex items-center gap-3 text-text-muted">
                 <Check className="w-5 h-5 text-success" />
@@ -97,13 +120,17 @@ export default function Billing() {
                 Custom domains
               </li>
             </ul>
-            
+
             <button
               onClick={handleUpgrade}
-              disabled={checkoutMutation.isPending}
-              className="w-full px-6 py-3 bg-accent hover:bg-accent/90 disabled:bg-accent/50 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+              disabled={checkoutMutation.isPending || isPro}
+              className={`w-full px-6 py-3 font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 ${
+                isPro
+                  ? 'bg-surface border border-border text-text-muted cursor-not-allowed'
+                  : 'bg-accent hover:bg-accent/90 disabled:bg-accent/50 text-white'
+              }`}
             >
-              {checkoutMutation.isPending ? 'Processing...' : (
+              {isPro ? 'Current Plan' : checkoutMutation.isPending ? 'Processing...' : (
                 <>
                   Upgrade to Pro
                   <ArrowRight className="w-5 h-5" />
