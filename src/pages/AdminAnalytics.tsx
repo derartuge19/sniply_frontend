@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 interface Subscription {
   user_email: string;
@@ -26,7 +26,7 @@ export default function AdminAnalytics() {
     },
   });
 
-  const { data: revenue, isLoading: revLoading } = useQuery({
+  const { data: revenue } = useQuery({
     queryKey: ['admin-revenue'],
     queryFn: async () => {
       const response = await api.get<Revenue>('/api/admin/revenue/');

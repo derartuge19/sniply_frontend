@@ -151,11 +151,14 @@ export default function LinkDetail() {
     });
   };
 
-  const formatChartDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-    });
+  const formatChartDate = (dateString: any) => {
+    if (typeof dateString === 'string') {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+      });
+    }
+    return dateString;
   };
 
   if (linkLoading || analyticsLoading) {
