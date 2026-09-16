@@ -115,10 +115,11 @@ export default function Register() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              minLength={6}
+              minLength={8}
               className="w-full px-4 py-3 bg-surface border border-border rounded-lg text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent transition-colors"
               placeholder="••••••••"
             />
+            <p className="text-xs text-text-muted mt-1">Must be at least 8 characters</p>
           </div>
 
           <button
