@@ -19,8 +19,9 @@ export default function BillingSuccess() {
         // If limit is null, user is on Pro
         if (limit === null) {
           setStatus('success');
-          // Invalidate usage cache so dashboard reflects Pro status
+          // Invalidate usage and links cache so dashboard reflects Pro status
           queryClient.invalidateQueries({ queryKey: ['usage'] });
+          queryClient.invalidateQueries({ queryKey: ['links'] });
           return true;
         }
 
